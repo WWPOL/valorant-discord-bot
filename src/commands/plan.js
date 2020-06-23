@@ -30,7 +30,7 @@ class PlanCommand extends Command {
 
 		  // If not being planned, mark being planned for the future
 		  return redis.set("planning", args.numPlayers).then(() => {
-			 return message.util.send(`A ${args.numPlayers} player game is now being planned. Type \`!join\` or join or \`!join @user\` to add another user. Type \`!stop-plan\` to stop planning this game.`);
+			 return message.util.send(`A ${args.numPlayers} player game is now being planned. Type \`!join-plan\` or join or \`!join-plan @user\` to add another user. Type \`!stop-plan\` to stop planning this game.`);
 		  });
 	   }).catch((err) => {
 		  console.error("Error starting a plan", err);
