@@ -55,6 +55,7 @@ This help text can be viewed with:
 ```
 
 # Development
+## Dependencies
 The following programs must be installed:
 
 - [Node.js](https://nodejs.org)
@@ -69,6 +70,7 @@ Install dependencies:
 % npm install
 ```
 
+## Configure
 Configure secrets:
 
 ```
@@ -78,6 +80,7 @@ Configure secrets:
 Then edit this file with your own values. To add the bot to your Discord server
 see the comment at the top of this file.
 
+## Run Bot
 Start Redis:
 
 ```
@@ -89,3 +92,7 @@ Run the bot (in another terminal):
 ```
 % npm start
 ```
+
+## Git Workflow
+The `master` branch should always be stable. Only push your code if you know
+its good. 
