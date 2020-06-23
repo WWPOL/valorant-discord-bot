@@ -5,8 +5,8 @@ const utils = require("../utils");
 
 class LeaveCommand extends Command {
     constructor() {
-	   super("leave", {
-		  aliases: ["leave"],
+	   super("leave-plan", {
+		  aliases: ["leave-plan"],
 		  args: [
 			 {
 				id: "player",

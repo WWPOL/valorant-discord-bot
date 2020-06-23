@@ -5,8 +5,8 @@ const utils = require("../utils");
 
 class ListCommand extends Command {
     constructor() {
-	   super("list", {
-		  aliases: ["list"],
+	   super("list-plan", {
+		  aliases: ["list-plan"],
 	   });
     }
 

@@ -5,8 +5,8 @@ const utils = require("../utils");
 
 class JoinCommand extends Command {
     constructor() {
-	   super("join", {
-		  aliases: ["join"],
+	   super("join-plan", {
+		  aliases: ["join-plan"],
 		  args: [
 			 {
 				id: "player",
