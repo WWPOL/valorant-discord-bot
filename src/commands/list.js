@@ -19,7 +19,7 @@ class ListCommand extends Command {
 
 		  // Get plan members
 		  return utils.list_plan(planning).then((msg) => {
-			 return message.reply(msg);
+			 return message.reply(`\n${msg}`);
 		  });
 		  
 	   }).catch((err) => {
