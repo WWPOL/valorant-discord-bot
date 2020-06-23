@@ -60,7 +60,8 @@ The following programs must be installed:
 - [Node.js](https://nodejs.org)
 - [Podman](https://podman.io) or [Docker](https://docker.com)
   - Note: If you are using Docker you must set the `CONTAINER_CLI` environment
-	variable to `docker`.
+	variable to `docker`. This is required because by default the `redis` script
+	uses Podman.
 	
 Install dependencies:
 
