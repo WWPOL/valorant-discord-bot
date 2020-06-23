@@ -4,10 +4,16 @@
 # - status: get status of container, outputs "running" if Redis server is running,
 #           "stopped" if the Redis container is stopped but still exists, and
 #           "not found" if the Redis container does not exist.
+# - stop: Stops and removes the Redis container.
+# - logs: View logs from Redis container.
+# - cli: Open a Redis CLI whic is connected to the container.
 if [ -z "$CONTAINER_CLI" ]; then
     CONTAINER_CLI="sudo podman"
 fi
-container_name=dev-valorant-discord-bot
+
+if [ -z "$CONTAINER_NAME" ]; then
+    CONTAINER_NAME=dev-valorant-discord-bot
+fi
 container_tag="redis:latest"
 
 function die() {
@@ -19,14 +25,14 @@ case "$1" in
     start)
 	   case $($0 status) in
 		  running) die "already running" ;;
-		  stopped) $CONTAINER_CLI start "$container_name" ;;
-		  "not found") $CONTAINER_CLI run -d --net host --name "$container_name" "$container_tag" ;;
+		  stopped) $CONTAINER_CLI start "$CONTAINER_NAME" ;;
+		  "not found") $CONTAINER_CLI run -d --net host --name "$CONTAINER_NAME" "$container_tag" ;;
 	   esac
 	   ;;
     status)
-	   if $CONTAINER_CLI ps | grep "$container_name" &> /dev/null; then
+	   if $CONTAINER_CLI ps | grep "$CONTAINER_NAME" &> /dev/null; then
 		  echo "running"
-	   elif $CONTAINER_CLI ps -a | grep "$container_name" &> /dev/null; then
+	   elif $CONTAINER_CLI ps -a | grep "$CONTAINER_NAME" &> /dev/null; then
 		  echo "stopped"
 	   else
 		  echo "not found"
@@ -35,11 +41,11 @@ case "$1" in
     stop)
 	   case $($0 status) in
 		  running)
-			 $CONTAINER_CLI stop "$container_name"
-			 $CONTAINER_CLI rm "$container_name"
+			 $CONTAINER_CLI stop "$CONTAINER_NAME"
+			 $CONTAINER_CLI rm "$CONTAINER_NAME"
 			 ;;
 		  stopped)
-			 $CONTAINER_CLI rm "$container_name"
+			 $CONTAINER_CLI rm "$CONTAINER_NAME"
 			 ;;
 		  *) die "Cannot stop and remove redis if not running" ;;
 	   esac
@@ -47,7 +53,7 @@ case "$1" in
     logs)
 	   case $($0 status) in
 		  running)
-			 $CONTAINER_CLI logs -f "$container_name"
+			 $CONTAINER_CLI logs -f "$CONTAINER_NAME"
 			 ;;
 		  *) die "Cannot get logs if Redis is not running" ;;
 	   esac
