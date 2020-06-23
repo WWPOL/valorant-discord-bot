@@ -5,6 +5,7 @@ Bot to manage VALORANT players and games in a Discord.
 - [Overview](#overview)
 - [Bot Usage](#bot-usage)
 - [Development](#development)
+- [Deployment](#deployment)
 
 # Overview
 Plan large games, make tier lists (TBD).
@@ -96,3 +97,14 @@ Run the bot (in another terminal):
 ## Git Workflow
 The `master` branch should always be stable. Only push your code if you know
 its good. 
+
+# Deployment
+Currently the bot is deployed on funkyboy.zone.  
+
+A read only deploy key was added to this repository to allow the server access.
+
+See the [funkyboy.zone `valorant-discord-bot` Salt state](https://github.com/Noah-Huppert/funkyboy.zone/blob/master/salt/valorant-discord-bot/init.sls)
+for details on how the bot is deployed.  
+
+To deploy a newer version have a funkyboy.zone administrator run the 
+`valorant-discord-bot` state.
