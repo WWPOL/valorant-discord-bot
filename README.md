@@ -88,7 +88,7 @@ Start Redis:
 % ./redis start
 ```
 
-Run the bot (in another terminal):
+Run the bot:
 
 ```
 % npm start
