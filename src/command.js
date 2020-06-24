@@ -13,21 +13,21 @@ const { Command } = require("discord.js-commando");
  * is different, see Better argument parsing for more.
  *
  * Better argument parsing:
- * The command specification can contain an `args` field which should be an object
- * who's keys are the name of the key which the argument value will be stored and
- * values are argument specification objects. These objects can have the 
- * following keys:
+ * The command specification can contain an `args` field which should be an object.
+ * Object keys are the name of the key under which the argument value will be 
+ * stored and passed to the command() method via the args argument. Values are 
+ * argument specification objects. These objects can have the following keys:
  *
  * - name (String, Optional): User friendly name of argument. If not provided this
  *       defaults to the `key` field with its first letter capitalized.
- * - type (Function/Class): Asynchronous function / class constuctor which is 
- *       called with the string value of the argument and the Discord Message, it 
- *       is expected to return the argument converted into the type.
- * - help (String): Help describing argument.
+ * - type (Function): Asynchronous function which is called with the string value
+ *       of the argument and the Discord Message as arguments, it is expected to
+ *       return the argument converted into the type.
+ * - description (String): Help describing argument.
  * - optional (Boolean, Optional): If true the argument won't be required.
- * - default (Function/Class, Optional): Asynchronous function / class construction
- *       which is called with the Discord Message object and should return a
- *       default value. Can only be provided if `optional` is true.
+ * - default (Function, Optional): Asynchronous function which is called with the 
+ *       Discord Message object as an argument. It should return a default value.
+ *       Can only be provided if `optional` is true.
  *
  * For example:
  * ```
@@ -36,6 +36,7 @@ const { Command } = require("discord.js-commando");
  *         foobar: {
  *             name: "Foo Bar",
  *             type: Number,
+ *             description: "A number which is an argument for the baz",
  *             optional: true,
  *             default: () => 30,
  *         },
@@ -59,6 +60,36 @@ class BaseCommand extends Command {
 	   var argsSpec = spec.args;
 	   delete spec.args;
 
+	   if (argsSpec === undefined) {
+		  argsSpec = {};
+	   }
+
+	   // Check for required argument specification fields
+	   var argSpecErrors = [];
+	   Object.keys(argsSpec).map((key) => {
+		  const argSpec = argsSpec[key];
+		  
+		  var missing = [];
+		  if (argSpec.type === undefined) {
+			 missing.push(`"type"`);
+		  }
+
+		  if (argSpec.description === undefined) {
+			 missing.push(`"description"`);
+		  }
+
+		  if (missing.length > 0) {
+			 argSpecErrors.push([key, missing]);
+		  }
+	   });
+
+	   if (argSpecErrors.length > 0) {
+		  var errStrs = argSpecErrors.map((e) => {
+			 return `"${e[0]}" argument specification is missing the ${e[1].join(", ")} field(s)`;
+		  });
+		  throw `Error registering the "${spec.name}" command: ${errStrs.join(",")}`;
+	   }
+
 	   // Default name to uppercase key
 	   Object.keys(argsSpec).map((key) => {
 		  const spec = argsSpec[key];
@@ -79,16 +110,16 @@ class BaseCommand extends Command {
 
 	   // Set custom format argument based on argsSpec
 	   spec.format = Object.keys(argsSpec).map((key) => {
-		  const spec = argsSpec[key];
+		  const argSpec = argsSpec[key];
 
 		  var pre = "";
 		  var post = "";
-		  if (spec.optional === true) {
+		  if (argSpec.optional === true) {
 			 pre = "[";
 			 post = "]";
 		  }
 
-		  return `${pre}<${spec.name}>${post}`
+		  return `${pre}<${argSpec.name}>${post}`
 	   }).join(" ");
 
 	   if (Object.keys(argsSpec).length > 0) {
@@ -99,23 +130,24 @@ class BaseCommand extends Command {
 		  }
 		  
 		  spec.details += Object.keys(argsSpec).map((key) => {
-			 const spec = argsSpec[key];
+			 const argSpec = argsSpec[key];
 
 			 var pre = "";
 			 var post = "";
-			 var optmsg = "";
-			 if (spec.optional === true) {
+			 var neededMsg = "(Required)";
+			 if (argSpec.optional === true) {
 				pre = "[";
 				post = "]";
-				optmsg = " (Optional)";
+				neededMsg = "(Optional)";
 			 }	 
 
-			 return `- \`${pre}<${spec.name}>${post}\` ${optmsg}: ${spec.help}`;
+			 return `- \`${pre}<${argSpec.name}>${post}\` ${neededMsg}: ${argSpec.description}`;
 		  }).join("\n");
 	   }
 	   
 	   super(client, spec);
 
+	   this.spec = spec;
 	   this.argsSpec = argsSpec;
     }
 
@@ -186,6 +218,10 @@ was \`${msgParts[i]}\`: ${e}`);
 			 return msg.reply(`Oops, it looks like something went wrong. Don't worry my owner has already been informed.`);
 		  });
     }
+
+    command(msg, args) {
+	   throw `"${this.spec.name}" command has not implemented the command() method`;
+    }
 }
 
 /**
@@ -254,4 +290,20 @@ class RiotID {
     }
 }
 
-module.exports = { DiscordUser, RiotID, Command: BaseCommand };
+/**
+ * Integer argument type.
+ */
+function Integer(value, msg) {
+    value = value.replace(",", "");
+    if (value.indexOf(".") !== -1) {
+	   throw "Must be an integer value"
+    }
+
+    if (/[0-9]+/.test(value) === false) {
+	   throw "Must be an integer value";
+    }
+
+    return parseInt(value);
+}
+
+module.exports = { Command: BaseCommand, DiscordUser, RiotID, Integer };

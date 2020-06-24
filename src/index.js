@@ -10,12 +10,13 @@ const client = new CommandoClient({
     commandPrefix: "v#",
     owner: config.ownerIDs,
 });
+
 mongoose.connect(`mongodb://127.0.0.1/valorant_discord_bot`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
 }).catch((err) => {
-    console.error("Failed to connect to MongoDB", err);
+    console.error("Failed to connect to MongoDB:", err);
 }).then(() => {
     console.log("MongoDB connected");
     
@@ -39,7 +40,7 @@ mongoose.connect(`mongodb://127.0.0.1/valorant_discord_bot`, {
     return new Promise((resolve, reject) => {
 	   client.once("ready", resolve);
 	   client.on("error", (err) => {
-		  console.error("Discord bot error", err);
+		  console.error("Discord bot error:", err);
 	   });
     });
 }).then(() => {
@@ -47,5 +48,6 @@ mongoose.connect(`mongodb://127.0.0.1/valorant_discord_bot`, {
     
     console.log("Discord bot ready");
 }).catch((err) => {
-    console.error("Error setting up Discord bot client", err);
+    console.error("Error setting up Discord bot client:", err);
+    process.exit(1);
 });
