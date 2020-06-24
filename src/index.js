@@ -27,6 +27,10 @@ mongoose.connect(`mongodb://127.0.0.1/valorant_discord_bot`, {
 	   .registerDefaultCommands()
 	   .registerCommandsIn(path.join(__dirname, "commands"));
 
+    client.login(config.botToken);
+
+    console.log("Discord bot authenticated");
+
     return new Promise((resolve, reject) => {
 	   client.once("ready", resolve);
 	   client.on("error", (err) => {
@@ -34,12 +38,9 @@ mongoose.connect(`mongodb://127.0.0.1/valorant_discord_bot`, {
 	   });
     });
 }).then(() => {
-    console.log("Discord bot ready");
+    client.user.setActivity("VALLYORANT");
     
-    client.login(config.botToken);
-    client.user.setActivity("Watchu want?");
-
-    console.log("Discord bot logged in");
+    console.log("Discord bot ready");
 }).catch((err) => {
     console.error("Error setting up Discord bot client", err);
 });
