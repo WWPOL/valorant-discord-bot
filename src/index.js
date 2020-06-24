@@ -19,12 +19,16 @@ mongoose.connect(`mongodb://127.0.0.1/valorant_discord_bot`, {
     console.log("MongoDB connected");
     
     client.registry
-	   .registerDefaultTypes()
 	   .registerGroups([
-		  ["main", "Main commands"],
+		  ["valorant", "VALORANT commands"],
 	   ])
+	   .registerDefaultTypes()
 	   .registerDefaultGroups()
-	   .registerDefaultCommands()
+	   .registerDefaultCommands({
+		  prefix: false,
+		  eval: false,
+		  commandState: false,
+	   })
 	   .registerCommandsIn(path.join(__dirname, "commands"));
 
     client.login(config.botToken);
