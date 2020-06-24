@@ -2,7 +2,7 @@
 // To add the bot to your server open this link in your browser.
 
 module.exports = {
-    ownerID: [
+    ownerIDs: [
 	   "DISCORD ID OF OWNER USER", // Multiple owner IDs can be given in the array
     ],
     botToken: "DISCORD BOT TOKEN",
