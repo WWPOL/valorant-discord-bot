@@ -23,6 +23,7 @@ const { Command } = require("discord.js-commando");
  * - type (Function/Class): Asynchronous function / class constuctor which is 
  *       called with the string value of the argument and the Discord Message, it 
  *       is expected to return the argument converted into the type.
+ * - help (String): Help describing argument.
  * - optional (Boolean, Optional): If true the argument won't be required.
  * - default (Function/Class, Optional): Asynchronous function / class construction
  *       which is called with the Discord Message object and should return a
@@ -77,12 +78,41 @@ class BaseCommand extends Command {
 	   }
 
 	   // Set custom format argument based on argsSpec
-	   var formatParts = Object.keys(argsSpec).map((key) => {
+	   spec.format = Object.keys(argsSpec).map((key) => {
 		  const spec = argsSpec[key];
 
-		  return `${spec.optional ? "[" : ""}<${spec.name}>${spec.optional ? "]" : ""}`
-	   });
-	   spec.format = formatParts.join(" ");
+		  var pre = "";
+		  var post = "";
+		  if (spec.optional === true) {
+			 pre = "[";
+			 post = "]";
+		  }
+
+		  return `${pre}<${spec.name}>${post}`
+	   }).join(" ");
+
+	   if (Object.keys(argsSpec).length > 0) {
+		  if (spec.details === undefined) {
+			 spec.details = `*N/A*\n**Arguments:**\n`;
+		  } else {
+			 spec.details += "\n**Arguments:**\n";
+		  }
+		  
+		  spec.details += Object.keys(argsSpec).map((key) => {
+			 const spec = argsSpec[key];
+
+			 var pre = "";
+			 var post = "";
+			 var optmsg = "";
+			 if (spec.optional === true) {
+				pre = "[";
+				post = "]";
+				optmsg = " (Optional)";
+			 }	 
+
+			 return `- \`${pre}<${spec.name}>${post}\` ${optmsg}: ${spec.help}`;
+		  }).join("\n");
+	   }
 	   
 	   super(client, spec);
 
@@ -167,6 +197,10 @@ class DiscordUser {
 	   this.name = name;
 	   this.discriminator = discriminator;
     }
+
+    toString() {
+	   return `${this.name}#${this.discriminator}`;
+    }
     
     static async FromMsg(value, msg) {
 	   // Get user ID
@@ -201,8 +235,8 @@ class DiscordUser {
  * Riot ID argument type.
  */
 class RiotID {
-    constructor(username, tag) {
-	   this.username = username;
+    constructor(name, tag) {
+	   this.name = name;
 	   this.tag = tag;
     }
 

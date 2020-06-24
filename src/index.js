@@ -12,7 +12,8 @@ const client = new CommandoClient({
 });
 mongoose.connect(`mongodb://127.0.0.1/valorant_discord_bot`, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useFindAndModify: false,
 }).catch((err) => {
     console.error("Failed to connect to MongoDB", err);
 }).then(() => {
