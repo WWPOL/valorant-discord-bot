@@ -21,7 +21,7 @@ Bot brainstorming.
 `@bot who @<user>`  
 	Get the Riot ID of a Discord user
 	
-`@bot plan <number of players> [<match ID>]`  
+`@bot plan <number of players>`  
 	Start a match plan
 	
 `@bot status [<match ID>]`  
