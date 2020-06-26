@@ -1,5 +1,5 @@
 const { Command, DiscordUser } = require("../../command");
-const { User } = require("../../db");
+const { User } = require("../../data");
 
 class WhoCommand extends Command {
     constructor(client) {

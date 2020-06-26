@@ -1,7 +1,7 @@
 const randomWords = require("random-words");
 
 const { Command, Integer } = require("../../command");
-const { SUPPORTED_GAMES, Match } = require("../../db");
+const { SUPPORTED_GAMES, Match } = require("../../data");
 
 class PlanCommand extends Command {
     constructor(client) {

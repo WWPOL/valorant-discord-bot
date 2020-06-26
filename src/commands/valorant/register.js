@@ -1,5 +1,5 @@
 const { Command, DiscordUser, RiotID } = require("../../command");
-const { User } = require("../../db");
+const { User } = require("../../data");
 
 class RegisterCommand extends Command {
     constructor(client) {
