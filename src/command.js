@@ -69,23 +69,45 @@ class BaseCommand extends Command {
 	   Object.keys(argsSpec).map((key) => {
 		  const argSpec = argsSpec[key];
 		  
-		  var missing = [];
+		  var errs = [];
+
+		  // Check for missing required keys
 		  if (argSpec.type === undefined) {
-			 missing.push(`"type"`);
+			 errs.push(`missing "type" key`);
 		  }
 
 		  if (argSpec.description === undefined) {
-			 missing.push(`"description"`);
+			 errs.push(`missing "description" key`);
 		  }
 
-		  if (missing.length > 0) {
-			 argSpecErrors.push([key, missing]);
+		  // Check for keys which can only exist conditionally
+		  if ((argSpec.optional === undefined | argSpec.optional === false)
+			 && argSpec.default !== undefined) {
+			 errs.push(`cannot have "default" key if "optional" is set to false`);
+		  }
+
+		  // Check for keys of incorrect types
+		  [["name", "string"],
+		   ["type", "function"],
+		   ["description", "string"],
+		   ["optional", "boolean"],
+		   ["default", "function"]].map((typeSpec) => {
+			  if (argSpec[typeSpec[0]] !== undefined
+				 && typeof(argSpec[typeSpec[0]]) !== typeSpec[1]) {
+				 errs.push(`"${typeSpec[0]} field must be a "${typeSpec[1]}" \
+not a "${typeof(argSpec[typeSpec[0]])}"`);
+			  }
+		   });
+		   
+
+		  if (errs.length > 0) {
+			 argSpecErrors.push([key, errs]);
 		  }
 	   });
 
 	   if (argSpecErrors.length > 0) {
 		  var errStrs = argSpecErrors.map((e) => {
-			 return `"${e[0]}" argument specification is missing the ${e[1].join(", ")} field(s)`;
+			 return `error with "${e[0]}" argument specification: ${e[1].join(", ")}`;
 		  });
 		  throw `Error registering the "${spec.name}" command: ${errStrs.join(",")}`;
 	   }
