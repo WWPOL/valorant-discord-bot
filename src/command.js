@@ -321,6 +321,10 @@ class RiotID {
 
 	   return new RiotID(parts[0], parts[1]);
     }
+
+    toString() {
+	   return `${this.name}#${this.tag}`;
+    }
 }
 
 /**

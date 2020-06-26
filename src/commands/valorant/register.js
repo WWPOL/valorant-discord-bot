@@ -24,7 +24,7 @@ class RegisterCommand extends Command {
     }
 
     async command(msg, { discordUser, riotID }) {
-	   await User.findOneAndUpdate({
+	   var queryRes = await User.findOneAndUpdate({
 		  "discord.id": discordUser.id,
 	   }, {
 		  discord: discordUser,
@@ -32,9 +32,16 @@ class RegisterCommand extends Command {
 	   }, {
 		  upsert: true
 	   });
-	   
-	   return msg.say(`Thanks, now I know \`${discordUser.toString()}\`'s Riot ID \
-is \`${riotID.name}#${riotID.tag}\``);
+
+	   if (queryRes === null || queryRes.riot.name !== riotID.name
+		  || queryRes.riot.tag !== riotID.tag) {
+		  return msg.say(`Thanks, now I know \`${discordUser.toString()}\`'s \
+Riot ID is \`${riotID.toString()}\``);
+	   } else {
+		  return msg.say(`Geeze you think you're so smart huh? :rolling_eyes: \
+I already knew \`${discordUser.toString()}\`'s Riot ID \
+was \`${riotID.toString()}\`.`);
+	   }
     }
 }
 
