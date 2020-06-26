@@ -173,6 +173,17 @@ not a "${typeof(argSpec[typeSpec[0]])}"`);
 	   this.argsSpec = argsSpec;
     }
 
+    /**
+	* Adds an "s" onto value if number is > 1.
+	*/
+    pluralize(value, number) {
+	   if (number > 1) {
+		  return `${value}s`;
+	   }
+
+	   return value;
+    }
+
     run(msg) {
 	   var msgParts = msg.argString.split(" ").filter((v) => v.length > 0);
 	   
