@@ -20,7 +20,18 @@ function check() {
 }
 
 if [ -z "$CONTAINER_CLI" ]; then
-    CONTAINER_CLI="sudo podman"
+    if which podman &> /dev/null; then
+	   # Non systemd machines currently need to run podman with sudo due to a bug
+	   if ls -l /sbin/init | grep "systemd" &> /dev/null; then
+		  CONTAINER_CLI=podman
+	   else
+		  CONTAINER_CLI="sudo podman"		  
+	   fi
+    elif which docker &> /dev/null; then
+	   CONTAINER_CLI=docker
+    else
+	   die "Either podman or docker must be installed"
+    fi
 fi
 
 if [ -z "$CONTAINER_NAME" ]; then
