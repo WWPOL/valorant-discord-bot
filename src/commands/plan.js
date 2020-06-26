@@ -16,11 +16,6 @@ class PlanCommand extends Command {
     }
 
     exec(message, args) {
-	   // Check args
-	   if ([5, 10].indexOf(args.numPlayers) === -1) {
-		  return message.reply("The `<number of players>` argument must be either `5` or `10`.");
-	   }
-
 	   // Check if already planning
 	   return redis.get("planning").then((res) => {
 		  // If already being planned
