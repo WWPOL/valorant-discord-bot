@@ -64,7 +64,7 @@ class BaseCommand extends Command {
 		  argsSpec = {};
 	   }
 
-	   // Check for required argument specification fields
+	   // Validate argument specifications
 	   var argSpecErrors = [];
 	   Object.keys(argsSpec).map((key) => {
 		  const argSpec = argsSpec[key];
