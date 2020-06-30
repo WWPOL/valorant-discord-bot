@@ -22,11 +22,12 @@ class WhoCommand extends Command {
 
 	   if (foundUser === null) {
 		  return msg.reply(`Hmm, I don't know \
-\`${user.toString()}\`'s Riot ID`);
+\`${user.toString()}\`'s Riot ID. Try using the \`register\` command to let me
+know their ID.`);
 	   }
 
 	   return msg.reply(`\`${user.toString()}\`'s Riot ID is \
-\`${foundUser.riot.name}#${foundUser.riot.tag}\``);
+\`${foundUser.riot.name}#${foundUser.riot.tag}\`.`);
     }
 }
 
