@@ -218,7 +218,7 @@ ${spec.name} not provided>`);
 					   return Promise.resolve();
 				    } else {
 					   runHandler = false;
-					   return msg.reply(`\`${spec.name}\` argument required`);
+					   return msg.channel.send(`\`${spec.name}\` argument required`);
 				    }
 				}
 				
@@ -233,7 +233,7 @@ ${spec.name} not provided>`);
 				    argValue = `\`${msgParts[i]}\``;
 				}
 				
-				return msg.reply(`Error with \`${spec.name}\` argument, \
+				return msg.channel.send(`Error with \`${spec.name}\` argument, \
 was ${argValue}: ${e}`);
 			 });
 
@@ -254,7 +254,7 @@ was ${argValue}: ${e}`);
 	   })
 		  .catch((e) => {
 			 console.error(e);
-			 return msg.reply(`Oops, it looks like something went wrong. Don't worry my owner has already been informed.`);
+			 return msg.channel.send(`Oops, it looks like something went wrong. Don't worry my owner has already been informed.`);
 		  });
     }
 
