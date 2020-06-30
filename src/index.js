@@ -11,7 +11,7 @@ const client = new CommandoClient({
     owner: config.ownerIDs,
 });
 
-mongoose.connect(`mongodb://127.0.0.1/valorant_discord_bot`, {
+mongoose.connect(config.mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
