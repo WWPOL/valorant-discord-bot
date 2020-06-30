@@ -1,21 +1,21 @@
 const { Command, DiscordUserArg, MatchArg } = require("../../command");
 const { User } = require("../../data");
 
-class JoinCommand extends Command {
+class LeaveCommand extends Command {
     constructor(client) {
 	   super(client, {
-		  name: "join",
-		  description: "Join a match.",
+		  name: "leave",
+		  description: "Leave a match.",
 		  args: {
 			 discordUser: {
 				type: DiscordUserArg.FromMsg,
-				description: "Discord user to add to Match.",
+				description: "Discord user to remove from a Match.",
 				optional: true,
 				default: DiscordUserArg.DefaultToAuthor,
 			 },
 			 match: {
 				type: MatchArg.FromMsg,
-				description: "Match to join.",
+				description: "Match to leave.",
 				optional: true,
 				default: MatchArg.DefaultToOnly,
 			 },
@@ -36,20 +36,20 @@ tell me who they are.`);
 	   }
 
 	   // Check not already in the plan
-	   if (match.signed_up.indexOf(user._id) !== -1) {
-		  return msg.reply(`\`${discordUser.toString()}\` is already in the \
+	   if (match.signed_up.indexOf(user._id) === -1) {
+		  return msg.reply(`\`${discordUser.toString()}\` is not in the \
 ${match.size} player match for ${match.game} (Named \`${match.match_id}\`).`);
 	   }
-	   
-	   match.signed_up.push(user._id);
+
+	   match.signed_up.splice(match.signed_up.indexOf(user._id), 1);
 	   await match.save();
 
 	   const statusList = await match.statusList();
 
-	   return msg.channel.send(`\`${user.name}\` has joined the ${match.size} player plan for ${match.game} (Named \`${match.match_id}\`)
+	   return msg.channel.send(`\`${discordUser.toString()}\` has left the ${match.size} player plan for ${match.game} (Named \`${match.match_id}\`)
 
 ${statusList.join("\n")}`);
     }
 }
 
-module.exports = JoinCommand;
+module.exports = LeaveCommand;

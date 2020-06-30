@@ -366,11 +366,13 @@ const MatchArg = {
 none going on right now. Please use a specific match ID.`;
 	   } else if (matches.length > 1) {
 		  var matchesList = matches.map((match) => {
-			 return `\`${match.match_id}\` ${match.game}`;
-		  }).join("\n- ");
+			 return `\`${match.match_id}\` - ${match.size} ${match.pluralize("player")}, ${match.game}`;
+		  }).join("\n• ");
 		  
 		  throw `There are multiple matches going on right now. Please use \
-the match ID to tell me know which one:${matchesList}`;
+the match ID to tell me know which one:
+
+• ${matchesList}`;
 	   } else {
 		  return matches[0];
 	   }

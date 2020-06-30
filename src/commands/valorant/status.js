@@ -21,6 +21,7 @@ class StatusCommand extends Command {
 	   const statusList = await match.statusList();
 	   
 	   return msg.channel.send(`**Match of ${match.size} ${match.pluralize("player")} for ${match.game}** (Named \`${match.match_id}\`)
+
 ${statusList.join("\n")}`);
     }
 }
