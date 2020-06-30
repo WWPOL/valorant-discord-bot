@@ -7,7 +7,7 @@ const config = require("./config");
 
 
 const client = new CommandoClient({
-    commandPrefix: "v#",
+    commandPrefix: config.botPrefix,
     owner: config.ownerIDs,
 });
 
