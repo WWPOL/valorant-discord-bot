@@ -2,7 +2,7 @@ const { Command, MatchArg } = require("../../command");
 const { SUPPORTED_GAMES, Match } = require("../../data");
 
 const randomWords = require("random-words");
-m31004	
+
 class CancelCommand extends Command {
     constructor(client) {
 	   super(client, {
