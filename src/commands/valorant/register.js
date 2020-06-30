@@ -10,14 +10,14 @@ class RegisterCommand extends Command {
 			 discordUser: {
 				name: "Discord User",
 				type: DiscordUserArg.FromMsg,
-				description: "Discord user to associate with Riot ID",
+				description: "Discord user to associate with Riot ID.",
 				optional: true,
 				default: DiscordUserArg.DefaultToAuthor,
 			 },
 			 riotID: {
 				name: "Riot ID",
 				type: RiotIDArg.FromMsg,
-				description: "Riot ID of user",
+				description: "Riot ID of user.",
 			 },
 		  },
 	   });

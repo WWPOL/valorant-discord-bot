@@ -15,12 +15,12 @@ determine what time everyone can play, decide what map to play, and more!`,
 		  args: {
 			 game: {
 				type: String,
-				description: "Name of game",
+				description: "Name of game.",
 			 },
 			 numPlayers: {
 				name: "Number Of Players",
 				type: PositiveIntegerArg,
-				description: "The number of players which plan will include",
+				description: "The number of players which plan will include.",
 			 },
 		  },
 	   });
@@ -48,7 +48,7 @@ determine what time everyone can play, decide what map to play, and more!`,
 		  supportedGameMsg = `\n> ${SUPPORTED_GAMES[match.game_type].customPlanMessage}`;
 	   }
 
-	   return msg.say(`**Match of ${match.size} ${this.pluralize("player", match.size)} for ${match.game} now being planned.**
+	   return msg.say(`**Match of ${match.size} ${match.pluralize("player")} for ${match.game} now being planned.**
 > The name of this match is "\`${match.match_id}\`". If there's more than one match going on use the word "\`${match.match_id}\`" to let me know what match you're talking about.${supportedGameMsg}`);
     }
 }

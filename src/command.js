@@ -2,7 +2,13 @@ const { Command } = require("discord.js-commando");
 const { SUPPORTED_GAMES, Match } = require("./data");
 
 /**
- * Custom base class which all other bot commnads should extend. Provides enhanced
+ * Characters which are considered valid punctuation when ending a sentence.
+ */
+const VALID_PUNCTUATION = [ ".", "?", "!" ];
+const VALID_PUNCTUATION_LIST_STR = `"${VALID_PUNCTUATION.join("\" \"")}"`;
+
+/**
+ * Custom base class which all other bot commands should extend. Provides enhanced
  * functionality ontop of the existing base Command class:
  *
  * - Better argument parsing
@@ -64,6 +70,21 @@ class BaseCommand extends Command {
 	   if (argsSpec === undefined) {
 		  argsSpec = {};
 	   }
+	   
+	   // Validate command specification
+	   var cmdSpecErrors = [];
+
+	   // Check for missing required keys
+	   ["name", "description"].map((key) => {
+		  if (spec[key] === undefined) {
+			 cmdSpecErrors.push(`missing "${key}" key`);
+		  }
+	   });
+
+	   // Ensure fields which must end in a period do
+	   if (VALID_PUNCTUATION.indexOf(spec.description[spec.description.length - 1]) === -1) {
+		  cmdSpecErrors.push(`"description" field's value must end with punctuation (${VALID_PUNCTUATION_LIST_STR})`);
+	   }
 
 	   // Validate argument specifications
 	   var argSpecErrors = [];
@@ -88,6 +109,7 @@ class BaseCommand extends Command {
 		  }
 
 		  // Check for keys of incorrect types
+		  // [ key, expected type ]
 		  [["name", "string"],
 		   ["type", "function"],
 		   ["description", "string"],
@@ -99,28 +121,35 @@ class BaseCommand extends Command {
 not a "${typeof(argSpec[typeSpec[0]])}"`);
 			  }
 		   });
-		   
 
+		  // Check that keys which should end in periods do
+		  if (VALID_PUNCTUATION.indexOf(argSpec.description[argSpec.description.length - 1]) === -1) {
+			 errs.push(`"description" field's value must end with punctuation (${VALID_PUNCTUATION_LIST_STR})`);
+		  }
+
+		  // Default name to uppercase key
+		  if (spec.name === undefined) {
+			 argsSpec[key].name = key[0].toUpperCase() + key.substr(1);
+		  }
+
+		  // Push errors if they exist
 		  if (errs.length > 0) {
 			 argSpecErrors.push([key, errs]);
 		  }
 	   });
 
+	   
 	   if (argSpecErrors.length > 0) {
 		  var errStrs = argSpecErrors.map((e) => {
 			 return `error with "${e[0]}" argument specification: ${e[1].join(", ")}`;
 		  });
-		  throw `Error registering the "${spec.name}" command: ${errStrs.join(",")}`;
+		  cmdSpecErrors.push(errStrs.join(", "));
 	   }
 
-	   // Default name to uppercase key
-	   Object.keys(argsSpec).map((key) => {
-		  const spec = argsSpec[key];
-
-		  if (spec.name === undefined) {
-			 argsSpec[key].name = key[0].toUpperCase() + key.substr(1);
-		  }
-	   });
+	   // Raise error with command if the command specification has errors.
+	   if (cmdSpecErrors.length > 0) {
+		  throw `Error registering the "${spec.name}" command: ${cmdSpecErrors.join(",")}`;
+	   }
 
 	   // Allow user to omit memberName and group fields
 	   if (spec.memberName === undefined) {
@@ -167,7 +196,8 @@ not a "${typeof(argSpec[typeSpec[0]])}"`);
 			 return `- \`${pre}<${argSpec.name}>${post}\` ${neededMsg}: ${argSpec.description}`;
 		  }).join("\n");
 	   }
-	   
+
+	   // Initialize class
 	   super(client, spec);
 
 	   this.spec = spec;
@@ -175,16 +205,8 @@ not a "${typeof(argSpec[typeSpec[0]])}"`);
     }
 
     /**
-	* Adds an "s" onto value if number is > 1.
-	*/
-    pluralize(value, number) {
-	   if (number > 1) {
-		  return `${value}s`;
-	   }
-
-	   return value;
-    }
-
+	* Runs custom argument parsing logic then runs the command's custom handler.
+     */
     run(msg) {
 	   var msgParts = msg.argString.split(" ").filter((v) => v.length > 0);
 	   
@@ -258,13 +280,18 @@ was ${argValue}: ${e}`);
 		  });
     }
 
+    /**
+	* Default implementation of command handler method which lets developers know
+	* their class isn't ready.
+	*/
     command(msg, args) {
 	   throw `"${this.spec.name}" command has not implemented the command() method`;
     }
 }
 
 /**
- * Argument which references a Discord user.
+ * Argument which is a Discord user mention. Like @user.
+ * Later this type will support fuzzy user matching but right now it does not.
  */
 class DiscordUserArg {
     constructor(id, name, discriminator) {
@@ -273,10 +300,18 @@ class DiscordUserArg {
 	   this.discriminator = discriminator;
     }
 
+    /**
+	* @returns {String} - Discord user formatted with name and discriminator 
+	*     but in a format which doesn't ping the user when sent to a chat.
+	*/
     toString() {
 	   return `${this.name}#${this.discriminator}`;
     }
-    
+
+    /**
+	* Creates a DiscordUserArg from a message's text. 
+	* @returns {DiscordUserArg}
+	*/
     static async FromMsg(value, msg) {
 	   // Get user ID
 	   const matches = value.match(/<@!([0-9]{18})>/);
@@ -300,6 +335,10 @@ class DiscordUserArg {
 		  });
     }
 
+    /**
+	* Creates a DiscordUserArg which is the author of the sent message.
+	* @returns {DiscordUserArg}
+	*/
     static DefaultToAuthor(msg) {
 	   return new DiscordUserArg(msg.author.id, msg.author.username,
 						    msg.author.discriminator);
@@ -315,6 +354,10 @@ class RiotIDArg {
 	   this.tag = tag;
     }
 
+    /**
+	* Tries to parse a Riot ID from text. Should be in the format username#tag.
+	* @returns {RiotIDArg}
+	*/
     static FromMsg(value, msg) {
 	   var parts = value.split("#");
 	   if (parts.length != 2 ) {
@@ -328,6 +371,11 @@ class RiotIDArg {
 	   return new RiotIDArg(parts[0], parts[1]);
     }
 
+    /**
+	* Returns a string representation of a Riot ID. In the format that users are
+	* expected to give Riot IDs.
+	* @returns {String}
+	*/
     toString() {
 	   return `${this.name}#${this.tag}`;
     }
@@ -335,6 +383,7 @@ class RiotIDArg {
 
 /**
  * Integer argument type.
+ * @returns {Number}
  */
 function IntegerArg(value, msg) {
     value = value.replace(",", "");
@@ -351,6 +400,7 @@ function IntegerArg(value, msg) {
 
 /**
  * Positive integer argument type.
+ * @returns {Number}
  */
 function PositiveIntegerArg(value, msg) {
     value = value.replace(",", "");
@@ -372,12 +422,25 @@ function PositiveIntegerArg(value, msg) {
 }
 
 /**
- * Match.
+ * Match stored in the database.
+ * @returns {Match}
  */
 const MatchArg = {
+    /**
+	* Finds a match by the match_id field in the database.
+	* @returns {Match}
+	*/
     FromMsg: async (id) => {
 	   return Match.findOne({ match_id: id });
     },
+
+    /**
+	* If there is only one match going on this match will be returned. If there
+	* are multiple matches going on it will return an error asking the user to
+	* enter the specific match_id and give then a list of ongoing match's and 
+	* their IDs.
+	* @returns {Match}
+	*/
     DefaultToOnly: async (msg) => {
 	   var matches = await Match.find({
 		  status: "planning",

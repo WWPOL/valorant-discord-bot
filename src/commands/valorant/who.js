@@ -9,7 +9,7 @@ class WhoCommand extends Command {
 		  args: {
 			 user: {
 				type: DiscordUserArg.FromMsg,
-				description: "Discord user of which to get Riot ID",
+				description: "Discord user of which to get Riot ID.",
 			 },
 		  },
 	   });
