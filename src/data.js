@@ -12,6 +12,14 @@ score keeping.`
     },
 };
 
+/*
+Notes about data schemas:
+
+- If a date is stored it is stored as a unix time stamp (milliseconds). Ignore 
+  the time portion of the resulting date.
+- If a time is stored it is stored as a unix time stamp (milliseconds).
+*/
+
 var UserSchema = new Schema({
     discord: new Schema({
 	   id: String,
@@ -52,21 +60,40 @@ var MatchSchema = new Schema({
 	   }),
 	   winning_captain: ObjectId,
     }),
-    status: { type: String, enum: ["planning", "ongoing", "finished", "canceled"] },
+    status: {
+	   type: String,
+	   enum: ["planning", "ongoing", "finished", "canceled"]
+    },
     votes: new Schema({
-	   time: [new Schema({
-		  time: Number,
-		  votes: Number,
-	   })],
+	   date: new Schema({
+		  responses: [new Schema({
+			 date: Number,
+			 votes: Number,
+		  })],
+		  result: Number,
+	   }),
+	   time: new Schema({
+		  responses: [new Schema({
+			 time: Number,
+			 votes: Number,
+		  })],
+		  result: Number,
+	   }),
     }),
     game_data: new Schema({
 	   valorant: new Schema({
 		  votes: new Schema({
 			 map: new Schema({
-				haven: Number,
-				bind: Number,
-				split: Number,
-				ascent: Number,
+				responses: new Schema({
+				    haven: Number,
+				    bind: Number,
+				    split: Number,
+				    ascent: Number,
+				}),
+				result: {
+				    type: String,
+				    enum: [ "haven", "bind", "split", "ascent" ]
+				},
 			 }),
 		  }),
 		  user_scores: [new Schema({
