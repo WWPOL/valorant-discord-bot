@@ -350,6 +350,28 @@ function IntegerArg(value, msg) {
 }
 
 /**
+ * Positive integer argument type.
+ */
+function PositiveIntegerArg(value, msg) {
+    value = value.replace(",", "");
+    if (value.indexOf(".") !== -1) {
+	   throw "Must be an integer value"
+    }
+
+    if (/[0-9]+/.test(value) === false) {
+	   throw "Must be an integer value";
+    }
+
+    const i = parseInt(value);
+    
+    if (i < 0) {
+	   throw "Must be a positive integer value";
+    }
+
+    return i;
+}
+
+/**
  * Match.
  */
 const MatchArg = {
@@ -384,5 +406,6 @@ module.exports = {
     DiscordUserArg,
     RiotIDArg,
     IntegerArg,
+    PositiveIntegerArg,
     MatchArg,
 };
