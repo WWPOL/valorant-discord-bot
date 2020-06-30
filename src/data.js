@@ -150,13 +150,23 @@ MatchSchema.methods.statusList = async function() {
     });
 
     var signedUpList = []
+    var waitListed = [];
 
-    for (var i = 0; i < this.size; i++) {
-	   if (i < signedUpUsers.length) {
+    for (var i = 0; i < signedUpUsers.length || i < this.size; i++) {
+	   if (i < signedUpUsers.length && i < this.size) {
+		  // If user is not on the wait list
 		  signedUpList.push(`${i+1}. ${signedUpUsers[i].discord.name}`);
+	   } else if (i < signedUpUsers.length && i > this.size - 1) {
+		  // If user is on the wait list
+		  waitListed.push(signedUpUsers[i].discord.name);
 	   } else {
+		  // Empty spot in match plan
 		  signedUpList.push(`${i+1}.`);
 	   }
+    }
+
+    if (waitListed.length > 0) {
+	   signedUpList.push(`Waitlisted: ${waitListed.join(", ")}`);
     }
 
     return signedUpList;
