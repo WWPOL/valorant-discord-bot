@@ -52,7 +52,7 @@ var MatchSchema = new Schema({
 	   }),
 	   winning_captain: ObjectId,
     }),
-    status: { type: String, enum: ["planning", "ongoing", "finished"] },
+    status: { type: String, enum: ["planning", "ongoing", "finished", "canceled"] },
     votes: new Schema({
 	   time: [new Schema({
 		  time: Number,
@@ -85,7 +85,7 @@ var MatchSchema = new Schema({
     }),
 });
 
-MatchSchema.statics.ParseGameType = (game) => {
+MatchSchema.statics.ParseGameType = function(game) {
     for (var k in SUPPORTED_GAMES) {
 	   const g = SUPPORTED_GAMES[k];
 	   
@@ -97,7 +97,7 @@ MatchSchema.statics.ParseGameType = (game) => {
     return "other";
 };
 
-MatchSchema.statics.ParseGame = (game) => {
+MatchSchema.statics.ParseGame = function(game) {
     var key = MatchSchema.statics.ParseGameType(game);
     
     if (key !== "other") {
@@ -105,6 +105,34 @@ MatchSchema.statics.ParseGame = (game) => {
     }
 
     return game;
+};
+
+MatchSchema.methods.pluralize = function(word) {
+    if (this.size > 1) {
+	   return `${word}s`;
+    }
+
+    return word;
+};
+
+MatchSchema.methods.statusList = async function() {
+    var signedUpUsers = await User.find({
+	   "_id": {
+		  $in: this.signed_up,
+	   }
+    });
+
+    var signedUpList = []
+
+    for (var i = 0; i < this.size; i++) {
+	   if (i < signedUpUsers.length) {
+		  signedUpList.push(`${i+1}. ${signedUpUsers[i].discord.name}`);
+	   } else {
+		  signedUpList.push(`${i+1}.`);
+	   }
+    }
+
+    return signedUpList;
 };
 
 var Match = mongoose.model("Match", MatchSchema);

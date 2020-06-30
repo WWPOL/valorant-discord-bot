@@ -1,4 +1,4 @@
-const { Command, DiscordUser, RiotID } = require("../../command");
+const { Command, DiscordUserArg, RiotIDArg } = require("../../command");
 const { User } = require("../../data");
 
 class RegisterCommand extends Command {
@@ -9,14 +9,14 @@ class RegisterCommand extends Command {
 		  args: {
 			 discordUser: {
 				name: "Discord User",
-				type: DiscordUser.FromMsg,
+				type: DiscordUserArg.FromMsg,
 				description: "Discord user to associate with Riot ID",
 				optional: true,
-				default: DiscordUser.DefaultToAuthor,
+				default: DiscordUserArg.DefaultToAuthor,
 			 },
 			 riotID: {
 				name: "Riot ID",
-				type: RiotID.FromMsg,
+				type: RiotIDArg.FromMsg,
 				description: "Riot ID of user",
 			 },
 		  },

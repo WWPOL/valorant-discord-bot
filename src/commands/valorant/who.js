@@ -1,4 +1,4 @@
-const { Command, DiscordUser } = require("../../command");
+const { Command, DiscordUserArg } = require("../../command");
 const { User } = require("../../data");
 
 class WhoCommand extends Command {
@@ -8,7 +8,7 @@ class WhoCommand extends Command {
 		  description: "Find the Riot ID of a Discord user.",
 		  args: {
 			 user: {
-				type: DiscordUser.FromMsg,
+				type: DiscordUserArg.FromMsg,
 				description: "Discord user of which to get Riot ID",
 			 },
 		  },

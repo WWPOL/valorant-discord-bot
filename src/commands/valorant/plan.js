@@ -1,6 +1,6 @@
 const randomWords = require("random-words");
 
-const { Command, Integer } = require("../../command");
+const { Command, IntegerArg } = require("../../command");
 const { SUPPORTED_GAMES, Match } = require("../../data");
 
 class PlanCommand extends Command {
@@ -19,7 +19,7 @@ determine what time everyone can play, decide what map to play, and more!`,
 			 },
 			 numPlayers: {
 				name: "Number Of Players",
-				type: Integer,
+				type: IntegerArg,
 				description: "The number of players which plan will include",
 			 },
 		  },

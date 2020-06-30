@@ -1,4 +1,5 @@
 const { Command } = require("discord.js-commando");
+const { SUPPORTED_GAMES, Match } = require("./data");
 
 /**
  * Custom base class which all other bot commnads should extend. Provides enhanced
@@ -94,7 +95,7 @@ class BaseCommand extends Command {
 		   ["default", "function"]].map((typeSpec) => {
 			  if (argSpec[typeSpec[0]] !== undefined
 				 && typeof(argSpec[typeSpec[0]]) !== typeSpec[1]) {
-				 errs.push(`"${typeSpec[0]} field must be a "${typeSpec[1]}" \
+				 errs.push(`"${typeSpec[0]}" field must be a "${typeSpec[1]}" \
 not a "${typeof(argSpec[typeSpec[0]])}"`);
 			  }
 		   });
@@ -227,8 +228,13 @@ ${spec.name} not provided>`);
 				args[key] = await Promise.resolve(spec.type(raw, msg));
 			 }().catch((e) => {
 				runHandler = false;
+				var argValue = "empty";
+				if (msgParts[i] !== undefined) {
+				    argValue = `\`${msgParts[i]}\``;
+				}
+				
 				return msg.reply(`Error with \`${spec.name}\` argument, \
-was \`${msgParts[i]}\`: ${e}`);
+was ${argValue}: ${e}`);
 			 });
 
 		  }
@@ -258,9 +264,9 @@ was \`${msgParts[i]}\`: ${e}`);
 }
 
 /**
- * Discord User argument type
+ * Argument which references a Discord user.
  */
-class DiscordUser {
+class DiscordUserArg {
     constructor(id, name, discriminator) {
 	   this.id = id;
 	   this.name = name;
@@ -285,8 +291,8 @@ class DiscordUser {
 		  .then((user) => {
 			 const userName = user.username;
 
-			 return Promise.resolve(new DiscordUser(userID, user.username,
-											user.discriminator));
+			 return Promise.resolve(new DiscordUserArg(userID, user.username,
+											   user.discriminator));
 		  })
 		  .catch((e) => {
 			 console.error(`Failed to find user "${userID}"`, e);
@@ -295,15 +301,15 @@ class DiscordUser {
     }
 
     static DefaultToAuthor(msg) {
-	   return new DiscordUser(msg.author.id, msg.author.username,
-						 msg.author.discriminator);
+	   return new DiscordUserArg(msg.author.id, msg.author.username,
+						    msg.author.discriminator);
     }
 }
 
 /**
  * Riot ID argument type.
  */
-class RiotID {
+class RiotIDArg {
     constructor(name, tag) {
 	   this.name = name;
 	   this.tag = tag;
@@ -319,7 +325,7 @@ class RiotID {
 		  throw "A Riot ID must be in the format: `username#tag`";
 	   }
 
-	   return new RiotID(parts[0], parts[1]);
+	   return new RiotIDArg(parts[0], parts[1]);
     }
 
     toString() {
@@ -330,7 +336,7 @@ class RiotID {
 /**
  * Integer argument type.
  */
-function Integer(value, msg) {
+function IntegerArg(value, msg) {
     value = value.replace(",", "");
     if (value.indexOf(".") !== -1) {
 	   throw "Must be an integer value"
@@ -343,4 +349,38 @@ function Integer(value, msg) {
     return parseInt(value);
 }
 
-module.exports = { Command: BaseCommand, DiscordUser, RiotID, Integer };
+/**
+ * Match.
+ */
+const MatchArg = {
+    FromMsg: async (id) => {
+	   return Match.findOne({ match_id: id });
+    },
+    DefaultToOnly: async (msg) => {
+	   var matches = await Match.find({
+		  status: "planning",
+	   });
+
+	   if (matches.length === 0) {
+		  throw `I don't know what match you're talking about since there are \
+none going on right now. Please use a specific match ID.`;
+	   } else if (matches.length > 1) {
+		  var matchesList = matches.map((match) => {
+			 return `\`${match.match_id}\` ${match.game}`;
+		  }).join("\n- ");
+		  
+		  throw `There are multiple matches going on right now. Please use \
+the match ID to tell me know which one:${matchesList}`;
+	   } else {
+		  return matches[0];
+	   }
+    },
+};
+
+module.exports = {
+    Command: BaseCommand,
+    DiscordUserArg,
+    RiotIDArg,
+    IntegerArg,
+    MatchArg,
+};
