@@ -464,11 +464,23 @@ the match ID to tell me know which one:
     },
 };
 
+
+const OneOfArg = (values) => {
+	return (value) => {
+	  if (values.indexOf(value) === -1) {
+		throw `Must be one of ${values.join(", ")}`;
+	  }
+	  return value;
+	};
+  };
+
+
 module.exports = {
     Command: BaseCommand,
     DiscordUserArg,
     RiotIDArg,
     IntegerArg,
     PositiveIntegerArg,
-    MatchArg,
+	MatchArg,
+	OneOfArg,
 };
