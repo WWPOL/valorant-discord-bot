@@ -13,6 +13,8 @@ Bot brainstorming.
 - Help place users onto teams
 - Automatically move teams to different voice channels
 - Record scores of completed games
+- If a match has been running for a day after it was supposed to take place then
+  PM the user who created it asking if they want to close the plan
 
 # Commands
 `@bot register [@<user>] <riot ID>`  
@@ -27,21 +29,17 @@ Bot brainstorming.
 `@bot status [<match ID>]`  
 	Show the status of a match plan
 	
-`@bot join [@<user>] [<match ID>]`  
+`@bot join [<match ID>] [@<user>]`  
 	Join a match plan
 	
-`@bot leave [@<user>] [<match ID>]`  
+`@bot leave [<match ID>] [@<user>]` 
 	Leave a match plan
 	
 `@bot when [<match ID>]`  
 	Get the time a match will occur
 	
-`@bot schedule [<match ID>] today|mm/dd/yy`  
-	Send a scheduling message which polls users about when they are available to
-	play the match.
-
-`@bot map [<match ID>] vote|bind|split|ascend|haven`  
-	Sets the map or calls a vote for the map
+`@bot vote [<match ID>] time|map options|option`  
+	Starts a vote or if a vote of the correct type is taking place casts a vote
 	
 `@bot team @<user> red|blue [<match ID>]`  
 	Assign a user to a team
@@ -58,6 +56,9 @@ Bot brainstorming.
 
 `@bot matches all|finished|upcoming`  
 	Gets matches which fit a criteria
+	
+`@bot game <game>`  
+	Shows information about a game
 
 # Data Model
 Mongo DB.
