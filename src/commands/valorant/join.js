@@ -7,17 +7,17 @@ class JoinCommand extends Command {
 		  name: "join",
 		  description: "Join a match.",
 		  args: {
-			 discordUser: {
-				type: DiscordUserArg.FromMsg,
-				description: "Discord user to add to Match.",
-				optional: true,
-				default: DiscordUserArg.DefaultToAuthor,
-			 },
 			 match: {
 				type: MatchArg.FromMsg,
 				description: "Match to join.",
 				optional: true,
 				default: MatchArg.DefaultToOnly,
+			 },
+			 discordUser: {
+				type: DiscordUserArg.FromMsg,
+				description: "Discord user to add to Match.",
+				optional: true,
+				default: DiscordUserArg.DefaultToAuthor,
 			 },
 		  }
 	   });
@@ -46,7 +46,7 @@ ${match.size} player match for ${match.game} (Named \`${match.match_id}\`).`);
 
 	   const statusList = await match.statusList();
 
-	   return msg.channel.send(`\`${user.name}\` has joined the ${match.size} player plan for ${match.game} (Named \`${match.match_id}\`)
+	   return msg.channel.send(`\`${discordUser.name}\` has joined the ${match.size} player plan for ${match.game} (Named \`${match.match_id}\`)
 
 ${statusList.join("\n")}`);
     }

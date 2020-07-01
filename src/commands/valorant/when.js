@@ -19,7 +19,7 @@ class WhenCommand extends Command {
 
     async command(msg, { match }) {
 	   // Check if voting is still taking place or hasn't started.
-	   if (dot.get(match, "votes.date.result") === undefined ||
+	   if (match.date === undefined ||
 		  dot.get(match, "votes.time.result") === undefined) {
 		  return msg.channel.send(`I don't know when the ${match.size} player match of ${match.game} will take place. Try using the \`schedule\` command to ask people when they want to play.`);
 	   }

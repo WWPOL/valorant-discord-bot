@@ -7,17 +7,17 @@ class LeaveCommand extends Command {
 		  name: "leave",
 		  description: "Leave a match.",
 		  args: {
-			 discordUser: {
-				type: DiscordUserArg.FromMsg,
-				description: "Discord user to remove from a Match.",
-				optional: true,
-				default: DiscordUserArg.DefaultToAuthor,
-			 },
 			 match: {
 				type: MatchArg.FromMsg,
 				description: "Match to leave.",
 				optional: true,
 				default: MatchArg.DefaultToOnly,
+			 },
+			 discordUser: {
+				type: DiscordUserArg.FromMsg,
+				description: "Discord user to remove from a Match.",
+				optional: true,
+				default: DiscordUserArg.DefaultToAuthor,
 			 },
 		  }
 	   });
