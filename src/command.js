@@ -45,7 +45,7 @@ const VALID_PUNCTUATION_LIST_STR = `"${VALID_PUNCTUATION.join("\" \"")}"`;
  *             type: Number,
  *             description: "A number which is an argument for the baz",
  *             optional: true,
- *             default: () => 30,
+ *             default: (msg) => 30,
  *         },
  *     },
  * }
@@ -234,8 +234,7 @@ not a "${typeof(argSpec[typeSpec[0]])}"`);
 					   // Put a dummy item in the msgParts array so that
 					   // future args which aren't optional will still be at
 					   // the correct index.
-					   msgParts.splice(i, 0, `<optional argument \
-${spec.name} not provided>`);
+					   msgParts.splice(i, 0, `<optional argument ${spec.name} not provided>`);
 					   
 					   return Promise.resolve();
 				    } else {
@@ -464,6 +463,64 @@ the match ID to tell me know which one:
     },
 };
 
+/**
+ * Argument which specified date.
+ */
+const DateArg = {
+    /**
+	* Indicates what time a match should be scheduled. Can be: "today",
+	* "tomorrow", "dd", "mm/dd", or "mm/dd/yyyy".
+	* @returns {Date}
+	*/
+    FromMsg: (value, msg) => {
+	   // Check if today or tomorrow
+	   if (value === "today") {
+		  return new Date();
+	   } else if (value === "tomorrow") {
+		  var d = new Date();
+		  d.setDate(d.getDate() + 1);
+
+		  return d;
+	   }
+
+	   // Check if a date
+	   var dateParts = value.split("/");
+	   const numSlashes = dateParts.length - 1;
+	   if (numSlashes === 0) {
+		  // Just the date.
+		  var d = new Date();
+		  d.setDate(dateParts[0]);
+
+		  return d;
+	   } else if (numSlashes === 1) {
+		  // Month and date
+		  var d = new Date();
+		  d.setDate(dateParts[1]);
+		  d.setMonth(dateParts[0]);
+
+		  return d;
+	   } else if (numSlashes === 2) {
+		  // Month, date, and year
+		  var d = new Date();
+		  d.setDate(dateParts[1]);
+		  d.setMonth(dateParts[0]);
+		  d.setYear(dateParts[2]);
+
+		  return d;
+	   } else {
+		  throw `Must either be a date in the american  format (\`dd\` or \`mm/dd\` or \`mm/dd/yyyy\`) or \`today\` or \`tomorrow\``;
+	   }
+    },
+
+    /**
+	* Defaults to the current day.
+	* @returns {Date}
+	*/
+    DefaultToToday: (msg) => {
+	   return new Date();
+    },
+};
+
 module.exports = {
     Command: BaseCommand,
     DiscordUserArg,
@@ -471,4 +528,5 @@ module.exports = {
     IntegerArg,
     PositiveIntegerArg,
     MatchArg,
+    DateArg,
 };

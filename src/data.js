@@ -64,14 +64,8 @@ var MatchSchema = new Schema({
 	   type: String,
 	   enum: ["planning", "ongoing", "finished", "canceled"]
     },
+    date: Number,
     votes: new Schema({
-	   date: new Schema({
-		  responses: [new Schema({
-			 date: Number,
-			 votes: Number,
-		  })],
-		  result: Number,
-	   }),
 	   time: new Schema({
 		  responses: [new Schema({
 			 time: Number,
@@ -148,6 +142,7 @@ MatchSchema.methods.statusList = async function() {
 		  $in: this.signed_up,
 	   }
     });
+    signedUpUsers = signedUpUsers.reverse(); // MongoDB join query returns the reversed order
 
     var signedUpList = []
     var waitListed = [];
@@ -165,8 +160,10 @@ MatchSchema.methods.statusList = async function() {
 	   }
     }
 
+    console.log(signedUpUsers);
+
     if (waitListed.length > 0) {
-	   signedUpList.push(`Waitlisted: ${waitListed.join(", ")}`);
+	   signedUpList.push(`\nWaitlisted: ${waitListed.join(", ")}`);
     }
 
     return signedUpList;
