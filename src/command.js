@@ -12,24 +12,37 @@ const VALID_PUNCTUATION_LIST_STR = `"${VALID_PUNCTUATION.join("\" \"")}"`;
  * functionality ontop of the existing base Command class:
  *
  * - Better argument parsing
- * - Asynchronous command handler method
  * - Removal of duplicate commands specification fields
  *
  * To start simply define a command as usual and override the command(msg, args)
  * method. Take note of the fact that the `args` field in the command specification
  * is different, see Better argument parsing for more.
  *
- * Better argument parsing:
- * The command specification can contain an `args` field which should be an object.
- * Object keys are the name of the key under which the argument value will be 
- * stored and passed to the command() method via the args argument. Values are 
- * argument specification objects. These objects can have the following keys:
+ *
+ * # Better Argument Parsing
+ * 
+ * The command specification can contain an `args` field. This should be an object
+ * with key value pairs which define command arguments.
+ * 
+ * The keys of this object are the same keys under which argument values will be
+ * stored when being passed to the command() handler.
+ *
+ * The values can either an argument specification object or an asynchronous 
+ * function which returns an additional command argument specification object. The 
+ * arguments in this object will be evaluated. This function will be called with the
+ * message arguments stack as its first argument and the existing argument values
+ * as the second argument. With a function no value will be stored for an argument
+ * under the key since the function is defining other arguments, with their 
+ * own keys. The function can also return undefined which indicates it does not
+ * wish to parse any additional arguments.
+ *
+ * Argument specification objects are defined as follows:
  *
  * - name (String, Optional): User friendly name of argument. If not provided this
  *       defaults to the `key` field with its first letter capitalized.
- * - type (Function): Asynchronous function which is called with the string value
- *       of the argument and the Discord Message as arguments, it is expected to
- *       return the argument converted into the type.
+ * - type (Function): Asynchronous function which is called with the arguments stack
+ *       and the Discord Message as arguments, it is expected to return a 
+ *       converted and validated argument value.
  * - description (String): Help describing argument.
  * - optional (Boolean, Optional): If true the argument won't be required.
  * - default (Function, Optional): Asynchronous function which is called with the 
@@ -37,8 +50,9 @@ const VALID_PUNCTUATION_LIST_STR = `"${VALID_PUNCTUATION.join("\" \"")}"`;
  *       Can only be provided if `optional` is true.
  *
  * For example:
- * ```
+ * ````js
  * {
+ *     name: "example1",
  *     args: {
  *         foobar: {
  *             name: "Foo Bar",
@@ -50,15 +64,49 @@ const VALID_PUNCTUATION_LIST_STR = `"${VALID_PUNCTUATION.join("\" \"")}"`;
  *     },
  * }
  * ```
- * Defines an optional number argument which defaults to `30` and who's value will 
- * be stored under the `foobar` key.
- *
- * Aynschronous command handler method:
- * When the command is sent by the user the command() method will be called with the
- * Discord Message and a map of arguments. This method is marked as asynchronous so
- * await syntax can be used.
+ * Defines a command with an optional foobar argument which accepts a number and
+ * defaults to 30:
  * 
- * Removal of duplicate commands specification fields:
+ * > @bot example1 60
+ * foobar=60
+ *
+ * > @bot example1
+ * foobar=30
+ *
+ * Another example:
+ * ```js
+ * {
+ *     name: "example2",
+ *     args: {
+ *         switch: { type: String, description: "Type 'baz' for a special" },
+ *         generative: (stack, { switch }) => {
+ *             if (switch === "baz") {
+ *                 return {
+ *                     special: { type: Number, description: "You only get me "+
+ *                                "if switch is baz" },
+ *                 };
+ *             }
+ *         },
+ *     },
+ * }
+ * ```
+ * Defines a command where if "baz" is passed an extra argument will be expected.
+ *
+ * > @bot example2 foo
+ * switch=foo
+ *
+ * > @bot example2
+ * Error due to the switch argument being required
+ *
+ * > @bot example2 baz 80
+ * switch=baz special=80
+ *
+ * > @bot example2 baz
+ * Error due to the special argument being required
+ *
+ *
+ * # Removal Of Duplicate Commands Specification Fields
+ * 
  * The .memberName and .group specification fields are not required.
  */
 class BaseCommand extends Command {

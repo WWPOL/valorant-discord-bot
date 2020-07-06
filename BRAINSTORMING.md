@@ -59,6 +59,9 @@ Bot brainstorming.
 	
 `@bot game <game>`  
 	Shows information about a game
+	
+`@bot random options...`  
+	Picks a random option
 
 # Data Model
 Mongo DB.
